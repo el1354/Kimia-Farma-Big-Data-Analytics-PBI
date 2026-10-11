@@ -2,12 +2,7 @@ CREATE TABLE `rakaminkfanalytics-510502.kimia_farma.kf_tabel_analisa` AS
 SELECT
   -- Data transaksi
   t.transaction_id,
-  -- kolom date di CSV berformat M/D/YYYY -> ubah ke tipe DATE
-  COALESCE(
-    SAFE.PARSE_DATE('%m/%d/%Y', CAST(t.date AS STRING)),
-    SAFE_CAST(t.date AS DATE)
-  ) AS date,
-
+  t.date,
 
   -- Data cabang
   t.branch_id,
@@ -16,14 +11,12 @@ SELECT
   c.provinsi,
   c.rating AS rating_cabang,
 
-
   -- Data customer & produk
   t.customer_name,
   t.product_id,
   p.product_name,
   t.price AS actual_price,
   t.discount_percentage,
-
 
   -- Persentase laba berdasarkan harga obat
   CASE
@@ -34,10 +27,8 @@ SELECT
     ELSE 0.30
   END AS persentase_gross_laba,
 
-
   -- nett_sales = harga setelah diskon
   t.price * (1 - t.discount_percentage) AS nett_sales,
-
 
   -- nett_profit = nett_sales x persentase gross laba
   t.price * (1 - t.discount_percentage) *
@@ -49,9 +40,7 @@ SELECT
     ELSE 0.30
   END AS nett_profit,
 
-
   t.rating AS rating_transaksi
-
 
 FROM `rakaminkfanalytics-510502.kimia_farma.kf_final_transaction` AS t
 LEFT JOIN `rakaminkfanalytics-510502.kimia_farma.kf_kantor_cabang` AS c
